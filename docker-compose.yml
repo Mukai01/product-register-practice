@@ -1,0 +1,33 @@
+version: '3'
+
+#docker-volumeを使う
+volumes:
+  db-data:
+
+services:
+  web:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - '.:/product-register'
+    # 環境変数を設定する
+    environment:
+      - 'DATABASE_PASSWORD=postgres'
+    tty: true
+    stdin_open: true
+    # depends_onのファイルができてからwebを動かす
+    depends_on:
+      - db
+    # webからリンクできるようになる
+    links:
+      - db
+
+  db:
+    image: postgres:13 #docker-hubのpostgresのイメージをpullしてくる
+    volumes:
+      - 'db-data:/var/lib/postgresql/data'
+    environment:
+    - 'POSTGRES_USER=postgres'
+    - 'POSTGRES_PASSWORD=postgres'
+    - 'POSTGRES_HOST_AUTH_METHOD=trust'
