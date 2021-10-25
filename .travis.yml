@@ -13,7 +13,6 @@ before_install:
 script:
   - docker-compose exec --env 'RAILS_ENV=test' web rails db:create
   - docker-compose exec --env 'RAILS_ENV=test' web rails db:migrate
-  # テスト実行
   - docker-compose exec --env 'RAILS_ENV=test' web rails test
 
 # deploy:
