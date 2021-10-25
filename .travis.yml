@@ -7,7 +7,7 @@ services: docker
 # コンテナを起動
 before_install:
   - docker-compose up --build -d
-  - docker login -u "$HEROKU_USERNAME" -p "$HEROKU_API_KEY" registry.heroku.com
+# - docker login -u "$HEROKU_USERNAME" -p "$HEROKU_API_KEY" registry.heroku.com
 
 # DBを準備
 script:
