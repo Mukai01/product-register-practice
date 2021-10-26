@@ -5,9 +5,10 @@ sudo: required
 services: docker
 
 # コンテナを起動
+# ログインするときのパスワードとして環境変数を使う
 before_install:
   - docker-compose up --build -d
-# - docker login -u "$HEROKU_USERNAME" -p "$HEROKU_API_KEY" registry.heroku.com
+  - docker login -u "$HEROKU_USERNAME" -p "$HEROKU_API_KEY" registry.heroku.com
 
 # DBを準備
 script:
@@ -15,11 +16,16 @@ script:
   - docker-compose exec --env 'RAILS_ENV=test' web rails db:migrate
   - docker-compose exec --env 'RAILS_ENV=test' web rails test
 
-# deploy:
-#   provider: script
-#   script:
-#     docker build -t registry.heroku.com/$HEROKU_APP_NAME/web -f Dockerfile.prod .;
-#     docker push registry.heroku.com/$HEROKU_APP_NAME/web;
-#     heroku run --app $HEROKU_APP_NAME rails db:migrate;
-#   on:
-#     branch: master
+# Heroku特有の書き方
+deploy:
+  provider: script
+  script:
+    # Dockerfile.prod　をタグ付けしながらbuild
+    docker build -t registry.heroku.com/$HEROKU_APP_NAME/web -f Dockerfile.prod .;
+    # HerokuのDockerレジストリにpush
+    docker push registry.heroku.com/$HEROKU_APP_NAME/web;
+    # コンテナを立てる際に、db:migrateを実行しておく
+    heroku run --app $HEROKU_APP_NAME rails db:migrate;
+  # masterにマージされたときだけdeployする
+  on:
+    branch: master
